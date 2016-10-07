@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "690541393154",
+    "firebase_url": "https://fir-demo-407c1.firebaseio.com",
+    "project_id": "fir-demo-407c1",
+    "storage_bucket": "fir-demo-407c1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:690541393154:android:293bc319c4ae3718",
+        "android_client_info": {
+          "package_name": "com.neolab.firebasedemo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "690541393154-dmscddup85e9b8psnhn8b40hvs1mkcel.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.neolab.firebasedemo",
+            "certificate_hash": "B6C3722F04AFFA607998CC306271BB629CFA0C09"
+          }
+        },
+        {
+          "client_id": "690541393154-f85m8egbss2hb32a4t30tisgr1ccio5l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAIVY9YrubhkTVo1ErutvLE9tMW7YU7GcU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "690541393154-f85m8egbss2hb32a4t30tisgr1ccio5l.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
