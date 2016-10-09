@@ -30,27 +30,44 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.neolab.firebasedemo.handler.UserHandler;
 import com.neolab.firebasedemo.models.User;
 
-public class SignInActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener,
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static com.neolab.firebasedemo.R.id.edt_password;
+
+public class SignInActivity extends BaseActivity implements GoogleApiClient.OnConnectionFailedListener,
         View.OnClickListener {
 
     private static final String TAG = "SignInActivity";
     private static final int RC_SIGN_IN = 9001;
     private SignInButton mSignInButton;
+    private Button mBtnRegister, mBtnLogin;
+    private EditText mEdtEmail, mEdtPassword;
 
     private GoogleApiClient mGoogleApiClient;
     private FirebaseAuth mFirebaseAuth;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
+        initialized();
+    }
 
+    @Override
+    protected void initViews() {
         // Assign fields
         mSignInButton = (SignInButton) findViewById(R.id.sign_in_button);
+        mBtnRegister = (Button) findViewById(R.id.btn_register);
+        mEdtEmail = (EditText) findViewById(R.id.edt_email_address);
+        mEdtPassword = (EditText) findViewById(R.id.edt_password);
+        mBtnLogin = (Button) findViewById(R.id.btn_log_in);
 
-        // Set click listeners
-        mSignInButton.setOnClickListener(this);
+    }
 
+    @Override
+    protected void initData() {
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
@@ -65,14 +82,55 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
     }
 
     @Override
+    protected void setViewListeners() {
+        // Set click listeners
+        mSignInButton.setOnClickListener(this);
+        mBtnRegister.setOnClickListener(this);
+        mBtnLogin.setOnClickListener(this);
+    }
+
+    @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.sign_in_button:
                 signIn();
                 break;
+            case R.id.btn_register:
+                startActivity(new Intent(this, RegisterActivity.class));
+                break;
+            case R.id.btn_log_in:
+                String email = mEdtEmail.getText().toString().trim();
+                if (email.isEmpty() || !validateEmail(email)) {
+                    Toast.makeText(this, "Please input email", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                String password = mEdtPassword.getText().toString().trim();
+                if (password.isEmpty()) {
+                    Toast.makeText(this, "Please input password", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                loginEmail(email, password);
+                break;
             default:
                 return;
         }
+    }
+
+    private void loginEmail(String email, String password) {
+        showProgressDialog();
+        mFirebaseAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        Log.d(TAG, "Log in task " + (task.isSuccessful() ? "success" : "fail"));
+                        if (task.isSuccessful()) {
+                            loginSuccess();
+                        } else {
+                            Toast.makeText(SignInActivity.this, "Log in fail " + (task.getException() !=  null ? task.getException().getMessage() : ", please try again"), Toast.LENGTH_SHORT).show();
+                        }
+                        hideProgressDialog();
+                    }
+                });
     }
 
     private void signIn() {
@@ -93,7 +151,7 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
                 firebaseAuthWithGoogle(account);
             } else {
                 // Google Sign In failed
-                Toast.makeText(this, "Login faile: " + result.toString(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Login fail: " + result.getStatus(), Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -115,19 +173,29 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
                             Toast.makeText(SignInActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                         } else {
-                            FirebaseUser user = mFirebaseAuth.getCurrentUser();
-                            if (user != null) {
-                                String fcmToken = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE).getString(Constants.PREF_FCM_TOKEN, null);
-                                UserHandler handler = new UserHandler();
-                                handler.addUser(new User(user.getUid(), user.getDisplayName(), user.getEmail(), user.getPhotoUrl().toString(), fcmToken));
-                            }
-                            // Subcribe topic when login
-                            FirebaseMessaging.getInstance().subscribeToTopic(Constants.FRIENDLY_ENGAGE_TOPIC);
-                            startActivity(new Intent(SignInActivity.this, ChatActivity.class));
-                            finish();
+                            loginSuccess();
                         }
                     }
                 });
+    }
+
+    private void loginSuccess() {
+        FirebaseUser user = mFirebaseAuth.getCurrentUser();
+        if (user != null) {
+            if (user.isEmailVerified()) {
+                String fcmToken = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE).getString(Constants.PREF_FCM_TOKEN, null);
+                UserHandler handler = new UserHandler();
+                String photoUrl = user.getPhotoUrl() != null ? user.getPhotoUrl().toString() : null;
+                handler.addUser(new User(user.getUid(), user.getDisplayName(), user.getEmail(), photoUrl, fcmToken));
+                // Subcribe topic when login
+                FirebaseMessaging.getInstance().subscribeToTopic(Constants.FRIENDLY_ENGAGE_TOPIC);
+                startActivity(new Intent(SignInActivity.this, ChatActivity.class));
+                finish();
+            } else {
+                Toast.makeText(this, "You have to confirm verification email before log in", Toast.LENGTH_SHORT).show();
+                mFirebaseAuth.signOut();
+            }
+        }
     }
 
     @Override
@@ -138,4 +206,11 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
         Toast.makeText(this, "Google Play Services error.", Toast.LENGTH_SHORT).show();
     }
 
+    public static final Pattern VALID_EMAIL_ADDRESS_REGEX =
+            Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+
+    public static boolean validateEmail(String emailStr) {
+        Matcher matcher = VALID_EMAIL_ADDRESS_REGEX .matcher(emailStr);
+        return matcher.find();
+    }
 }

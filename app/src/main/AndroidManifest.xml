@@ -13,10 +13,10 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".SignInActivity"/>
-        <activity android:name=".UserListActivity">
-
-        </activity>
+        <activity
+            android:name=".SignInActivity"
+            android:theme="@style/AuthenTheme"/>
+        <activity android:name=".UserListActivity"/>
 
         <service
             android:name=".MyFirebaseMessagingService"
@@ -39,6 +39,9 @@
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+        </activity>
+        <activity android:name=".RegisterActivity"
+            android:theme="@style/AuthenTheme">
         </activity>
     </application>
 

@@ -109,6 +109,7 @@ public class ChatActivity extends BaseActivity implements
                 // Unsubcribe topic after log out
                 FirebaseMessaging.getInstance().unsubscribeFromTopic(Constants.FRIENDLY_ENGAGE_TOPIC);
                 startActivity(new Intent(this, SignInActivity.class));
+                finish();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

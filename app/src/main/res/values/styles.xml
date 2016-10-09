@@ -17,4 +17,21 @@
 
     </style>
 
+    <!-- Base application theme. -->
+    <style name="AuthenTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="TextLabel" parent="TextAppearance.AppCompat">
+        <!-- Hint color and label color in FALSE state -->
+        <item name="android:textColorHint">@color/text_white_hint</item>
+        <item name="android:textSize">20sp</item>
+        <!-- Label color in TRUE state and bar color FALSE and TRUE State -->
+        <item name="colorAccent">@color/text_white_hint</item>
+        <item name="colorControlNormal">@color/text_white_hint</item>
+        <item name="colorControlActivated">@color/text_white_hint</item>
+    </style>
 </resources>
