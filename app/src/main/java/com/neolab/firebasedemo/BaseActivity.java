@@ -1,5 +1,6 @@
 package com.neolab.firebasedemo;
 
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.ViewGroup;
@@ -10,7 +11,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public abstract class BaseActivity extends AppCompatActivity {
 
-    private ProgressDialog mProgressDialog;
+    private Dialog mProgressDialog;
 
     protected abstract void initViews();
 
@@ -26,13 +27,9 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     public void showProgressDialog() {
         if (mProgressDialog == null) {
-            mProgressDialog = new ProgressDialog(this);
-            mProgressDialog.setCancelable(false);
-
+            mProgressDialog = buildProgressDialog();
         }
         mProgressDialog.show();
-        Window window = mProgressDialog.getWindow();
-        window.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
 
     public void hideProgressDialog() {
@@ -43,5 +40,13 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     public String getUid() {
         return FirebaseAuth.getInstance().getCurrentUser().getUid();
+    }
+
+    private Dialog buildProgressDialog() {
+        final Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_progress);
+        dialog.setCancelable(false);
+        return dialog;
     }
 }

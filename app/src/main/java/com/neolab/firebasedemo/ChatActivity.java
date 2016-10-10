@@ -3,6 +3,7 @@ package com.neolab.firebasedemo;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -209,6 +210,7 @@ public class ChatActivity extends BaseActivity implements
     }
 
     private void initMessageList() {
+        showProgressDialog();
         mMessageDb = FirebaseDatabase.getInstance().getReference().child(NODE_MESSAGE);
         mMessageDb.addChildEventListener(new ChildEventListener() {
             @Override
@@ -219,6 +221,7 @@ public class ChatActivity extends BaseActivity implements
                     mMessageAdapter.addMessage(message);
                     mRvMessage.scrollToPosition(mMessageAdapter.getItemCount());
                 }
+                hideProgressDialog();
             }
 
             @Override
@@ -248,6 +251,12 @@ public class ChatActivity extends BaseActivity implements
 
             }
         });
+        (new Handler()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                hideProgressDialog();
+            }
+        }, 10000);
     }
 
     private void editMessage(Message message) {
