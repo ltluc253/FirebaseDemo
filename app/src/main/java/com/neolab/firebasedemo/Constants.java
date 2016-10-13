@@ -10,6 +10,6 @@ public class Constants {
 
     public static final String PREF_FCM_TOKEN = "fcm_token";
 
-    public static final String FRIENDLY_ENGAGE_TOPIC = "friendly_engage";
+    public static final String FRIENDLY_ENGAGE_TOPIC = "firebase_demo";
 
 }
